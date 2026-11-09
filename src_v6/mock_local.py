@@ -2,15 +2,9 @@ import os
 from typing import Any
 import pandas as pd
 
-from vantage6.algorithm.tools.decorators import algorithm_client
-from vantage6.algorithm.client import AlgorithmClient
-from vantage6.client import UserClient as Client
 from vantage6.algorithm.tools.mock_client import MockAlgorithmClient
 
-from src.local import train_locally
-import os
-
-
+from src_v6.local import train_locally
 
 
 def mock_local(config:dict, model_weights: Any):
@@ -32,7 +26,7 @@ def mock_sub_central(config, model_weights):
     [{"database": pd.DataFrame(), "db_type": "csv"}],
     [{"database": pd.DataFrame(), "db_type": "csv"}]
     ]
-    client = MockAlgorithmClient(mock_datasets, module = "src.mock_local")
+    client = MockAlgorithmClient(mock_datasets, module = "src_v6.mock_local")
 
     input_= {
     "method": "mock_local",

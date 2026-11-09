@@ -7,12 +7,9 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
 
-from vantage6.algorithm.tools.decorators import algorithm_client
-from vantage6.algorithm.client import AlgorithmClient
 from vantage6.client import UserClient as Client
 
-from src.central import central
-from src.model import get_model
+from src_v6.model import get_model
 from test.test_data.load_MNIST import get_MNIST_partition
 
 

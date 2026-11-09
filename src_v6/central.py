@@ -5,8 +5,8 @@ import numpy as np
 from vantage6.algorithm.tools.decorators import algorithm_client
 from vantage6.algorithm.client import AlgorithmClient
 
-from src.model import get_model
-from src.average import average
+from src_v6.model import get_model
+from src_v6.average import average
 
 
 
@@ -56,12 +56,11 @@ def central(client: AlgorithmClient, config: dict = None, model_weights = None) 
         metrics[f'round {round}'] = {}
         local_weights = []
         local_sample_sizes = []
-        local_sample_sizes = []
 
         #TODO: client id -> org name
         for id, result in enumerate(task_results):
-            local_weights.append(result['model weights'])
-            local_sample_sizes.appen(result['sample size'])
+            local_weights.append(result['model_weights'])
+            local_sample_sizes.append(result['sample_size'])
             metrics[f'round {round}'][f'client {id}'] = result['metrics']
 
 

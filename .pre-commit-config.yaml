@@ -23,24 +23,28 @@ repos:
         stages: [commit, push]
 
   # --- CI job parity: lint-and-test ---
+  # Each hook first runs `uv sync --frozen` (idempotent) so it tests against
+  # the exact dependency set CI installs from uv.lock. If the venv is missing
+  # packages this syncs them in; if uv.lock and pyproject.toml have drifted it
+  # fails, same as CI.
   - repo: local
     hooks:
-      # mirrors the "Lint with flake8" step
+      # mirrors the "Install dependencies" + "Lint with flake8" steps
       - id: ci-flake8
         name: "CI parity: flake8 (lint-and-test)"
-        entry: 'bash -c "if ! .venv/bin/python -c ''import flake8'' >/dev/null 2>&1; then echo ''SKIP ci-flake8: flake8 not installed in .venv (uv pip install --python .venv/bin/python flake8)''; exit 0; fi; .venv/bin/python -m flake8 . --extend-exclude=.venv --count --select=E9,F63,F7,F82 --show-source --statistics"'
+        entry: 'bash -c "if ! command -v uv >/dev/null 2>&1; then echo ''SKIP ci-flake8: uv not found on PATH (expected while the project venv is still being set up)''; exit 0; fi; uv sync --frozen && uv run flake8 . --extend-exclude=.venv --count --select=E9,F63,F7,F82,F401 --show-source --statistics"'
         language: system
         pass_filenames: false
-        files: '^(src/|test/|main\.py)'
+        files: '^(src_v6/|test/|test_v6\.py|main\.py|pyproject\.toml|uv\.lock)'
         stages: [commit, push]
 
       # mirrors the "Vantage6 mock test" step
       - id: ci-mock-test
         name: "CI parity: vantage6 mock run (lint-and-test)"
-        entry: 'bash -c "if ! .venv/bin/python -c ''import vantage6.algorithm'' >/dev/null 2>&1; then echo ''SKIP ci-mock-test: vantage6-algorithm-tools not installed in .venv (uv pip install --python .venv/bin/python vantage6-algorithm-tools==4.15.3)''; exit 0; fi; .venv/bin/python test_v6.py"'
+        entry: 'bash -c "if ! command -v uv >/dev/null 2>&1; then echo ''SKIP ci-mock-test: uv not found on PATH (expected while the project venv is still being set up)''; exit 0; fi; uv sync --frozen && uv run python test_v6.py"'
         language: system
         pass_filenames: false
-        files: '^(src/|test/)'
+        files: '^(src_v6/|test/|test_v6\.py|pyproject\.toml|uv\.lock)'
         stages: [commit, push]
 
   # The build-and-push job's build step can be mirrored locally once the

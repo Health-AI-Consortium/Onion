@@ -14,7 +14,7 @@ mock_datasets = [
     [{"database": pd.DataFrame(), "db_type": "csv"}]
     ]
 
-module = "src.mock_local"
+module = "src_v6.mock_local"
 
 client = MockAlgorithmClient(mock_datasets, module)
 config = {}
