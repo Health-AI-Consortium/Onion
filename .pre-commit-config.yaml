@@ -1,0 +1,49 @@
+# Local mirrors of the jobs in .github/workflows/github_actions.yaml, so CI
+# failures are caught before pushing.
+#
+# Install:
+#   pre-commit install                          # pre-commit hook
+#   pre-commit install --hook-type pre-push     # pre-push hook
+#
+# The ci-* hooks run the exact commands the CI jobs run. While the project
+# venv is still being set up they warn and skip instead of failing.
+
+repos:
+  # --- workflow file hygiene ---
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml          # YAML syntax (workflows and other yaml files)
+        stages: [commit, push]
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint          # GitHub Actions semantics (if-exprs, action inputs, refs)
+        stages: [commit, push]
+
+  # --- CI job parity: lint-and-test ---
+  - repo: local
+    hooks:
+      # mirrors the "Lint with flake8" step
+      - id: ci-flake8
+        name: "CI parity: flake8 (lint-and-test)"
+        entry: 'bash -c "if ! .venv/bin/python -c ''import flake8'' >/dev/null 2>&1; then echo ''SKIP ci-flake8: flake8 not installed in .venv (uv pip install --python .venv/bin/python flake8)''; exit 0; fi; .venv/bin/python -m flake8 . --extend-exclude=.venv --count --select=E9,F63,F7,F82 --show-source --statistics"'
+        language: system
+        pass_filenames: false
+        files: '^(src/|test/|main\.py)'
+        stages: [commit, push]
+
+      # mirrors the "Vantage6 mock test" step
+      - id: ci-mock-test
+        name: "CI parity: vantage6 mock run (lint-and-test)"
+        entry: 'bash -c "if ! .venv/bin/python -c ''import vantage6.algorithm'' >/dev/null 2>&1; then echo ''SKIP ci-mock-test: vantage6-algorithm-tools not installed in .venv (uv pip install --python .venv/bin/python vantage6-algorithm-tools==4.15.3)''; exit 0; fi; .venv/bin/python test_v6.py"'
+        language: system
+        pass_filenames: false
+        files: '^(src/|test/)'
+        stages: [commit, push]
+
+  # The build-and-push job's build step can be mirrored locally once the
+  # Dockerfile has content:
+  #   docker build -t onion-ci-smoke .
+  # (the push itself needs GITHUB_TOKEN and only runs on tag pushes)

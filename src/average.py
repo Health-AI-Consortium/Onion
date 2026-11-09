@@ -1,0 +1,6 @@
+
+
+
+
+def average():
+    pass
