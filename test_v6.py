@@ -6,7 +6,7 @@ import os
 # a bit whacky, we set this at 1 later when we're deeper into the hierarchy to switch.
 # should probably do this in logic based on an architecture definition
 os.environ['END_NODE'] = "FALSE"
-
+os.environ['ID'] = "0"
 
 
 mock_datasets = [

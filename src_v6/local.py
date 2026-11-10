@@ -1,4 +1,6 @@
 import os
+from os.path  import join
+
 from typing import Any
 
 import numpy as np
@@ -10,13 +12,22 @@ from torch.utils.data import DataLoader, TensorDataset
 from vantage6.client import UserClient as Client
 
 from src_v6.model import get_model
-from test.test_data.load_MNIST import get_MNIST_partition
+from test.test_data.load_MNIST import MnistDataloader
 
 
 def local(config: dict, model_weights: Any):
 
     if os.environ['END_NODE'] == "TRUE":
-        return train_locally(config, model_weights)
+    # load this client's local data shard
+        default_path = "test/test/data/MNIST/"
+        base_path = os.environ.get("DATA_PATH", default_path)
+        paths = {
+        "train": (join(base_path, "train-images.idx3-ubyte"), join(base_path, "train-labels.idx1-ubyte")),
+        "test": (join(base_path, "t10k-images.idx3-ubyte"), join(base_path, "t10k-labels.idx1-ubyte")),
+        }
+        data_loader = MnistDataloader(*paths["train"], *paths["test"]).load_data()
+
+        return train_locally(config, model_weights, data_loader)
     else:
         return sub_central(config, model_weights)
 
@@ -55,7 +66,7 @@ def sub_central(config, model_weights):
 
 
 
-def train_locally(config, model_weights):
+def train_locally(config, model_weights, train, test):
     """Train on this client's local MNIST shard (proof of concept)."""
     if config is None:
         config = {}
@@ -72,10 +83,10 @@ def train_locally(config, model_weights):
         model.load_weights({k: torch.tensor(v) for k, v in model_weights.items()})
     model = model.to(device)
 
-    # load this client's local data shard
-    partition_id = config.get("partition_id", 0)
-    num_partitions = config.get("num_partitions", 1)
-    (x_train, y_train), (x_test, y_test) = get_MNIST_partition(partition_id, num_partitions, seed=seed)
+    x_train = train[0]
+    y_train = train[1]
+    x_test = test[0]
+    y_test = test[1]
 
     x_train = torch.from_numpy(x_train).to(torch.float32).div(255.0).unsqueeze(1)
     y_train = torch.from_numpy(y_train).to(torch.long)
@@ -103,7 +114,7 @@ def train_locally(config, model_weights):
             running_loss += loss.item() * xb.size(0)
         epoch_loss = running_loss / len(train_dataset)
         metrics[f"train_loss_epoch_{epoch}"] = epoch_loss
-        print(f"[train_locally] partition {partition_id} epoch {epoch}/{epochs} loss: {epoch_loss:.4f}")
+        # print(f"[train_locally] partition {partition_id} epoch {epoch}/{epochs} loss: {epoch_loss:.4f}")
 
     # evaluate on the client's held-out test shard
     model.eval()

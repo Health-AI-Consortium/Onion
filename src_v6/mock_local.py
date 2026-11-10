@@ -5,7 +5,7 @@ import pandas as pd
 from vantage6.algorithm.tools.mock_client import MockAlgorithmClient
 
 from src_v6.local import train_locally
-
+from test.test_data.load_MNIST import get_MNIST_partition
 
 def mock_local(config:dict, model_weights: Any):
     print("in mock local")
@@ -46,4 +46,10 @@ def mock_sub_central(config, model_weights):
     return result
 
 def mock_train_locally(config, model_weights):
-    return train_locally(config, model_weights)
+    # load this client's local data shard
+    partition_id = int(os.environ.get("ID"))
+    os.environ['ID'] = str(partition_id + 1)
+    num_partitions = config.get("num_partitions", 4)
+    (x_train, y_train), (x_test, y_test) = get_MNIST_partition(partition_id, num_partitions, seed=7)
+
+    return train_locally(config, model_weights, [x_train, y_train], [x_test, y_test])
