@@ -4,7 +4,8 @@ import numpy as np # linear algebra
 import struct
 from array import array
 from os.path  import join
-
+import argparse
+from test.test_data.download_MNIST import download_MNIST
 
 #
 # MNIST Data Loader Class
@@ -135,3 +136,21 @@ def get_MNIST_partition(partition_id: int, num_partitions: int, seed: int = 7):
     train_idx = _partition_indices(len(x_train), num_partitions, seed)[partition_id]
     test_idx = _partition_indices(len(x_test), num_partitions, seed)[partition_id]
     return (x_train[train_idx], y_train[train_idx]), (x_test[test_idx], y_test[test_idx])
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--seed", default= 7)
+    # parser.add_argument("--id", default = 0)
+    parser.add_argument("--partitions", default = 4)
+
+    args = parser.parse_args()
+
+    mnist_path = download_MNIST()
+    partitions = partition_MNIST(num_partitions = args.partitions, seed = args.seed)
+
+
+    # x_train, y_train, x_test, y_test = get_MNIST_partition(args.id, args.partitions, args.seed)
+   
