@@ -80,7 +80,7 @@ def train_locally(config, model_weights, train, test):
     # load the distributed weights, or initialize fresh
     model = get_model(config)
     if model_weights:
-        model.load_weights({k: torch.tensor(v) for k, v in model_weights.items()})
+        model.load_weights(model_weights)
     model = model.to(device)
 
     x_train = train[0]
@@ -124,5 +124,5 @@ def train_locally(config, model_weights, train, test):
 
     # convert weights to plain floats so they are JSON-serializable in the
     # vantage6 task result (Tensors are not)
-    weights = {k: v.tolist() for k, v in model.get_weights().items()}
+    weights = model.get_weights()
     return {"model_weights": weights, "sample_size": len(train_dataset), "metrics": metrics}

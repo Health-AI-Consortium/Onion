@@ -26,7 +26,7 @@ class base_NN(nn.Module):
         weights = self.state_dict()
         weights_dict = {}
         for layer in weights.keys():
-            weights_dict[layer] = weights[layer].detach().numpy()
+            weights_dict[layer] = weights[layer].detach().tolist()
         return weights_dict
 
     def load_weights(self, weights_dict: dict):
