@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 test/test_data/MNIST/
 test/API_keys*.txt
+credentials.py

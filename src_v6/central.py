@@ -11,17 +11,9 @@ from src_v6.average import average
 
 
 @algorithm_client
-def central(client: AlgorithmClient, config: dict = None, model_weights = None) -> Any:
+def central(client: AlgorithmClient, config: dict, model_weights = None) -> Any:
 
-    # config placeholder - move this to any other config passing (file-based, function argument, other)
-    if config is None:
-        config = {
-            "num_rounds": 3,
-            "model" : "base",
-            "participating_orgs": [0,1],
-            "seed" : 7,
-            "current_level" : -1
-        }
+
 
     # define organizations that participate
     participating_orgs = config['participating_orgs']
@@ -47,7 +39,7 @@ def central(client: AlgorithmClient, config: dict = None, model_weights = None) 
 
         # send task to clients and wait for result
         task = client.task.create(
-            input = input_,
+            input_ = input_,
             organizations=participating_orgs
         )
         task_results = client.wait_for_results(task)
