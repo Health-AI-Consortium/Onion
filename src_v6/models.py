@@ -22,8 +22,15 @@ class base_NN(nn.Module):
         x = torch.flatten(x, start_dim=1)
         return self.classifier(x)
 
-    def get_weights(self):
-        return self.state_dict()
+    def get_weights(self)-> dict:
+        weights = self.state_dict()
+        weights_dict = {}
+        for layer in weights.keys():
+            weights_dict[layer] = weights[layer].detach().numpy()
+        return weights_dict
 
-    def load_weights(self, weights):
+    def load_weights(self, weights_dict: dict):
+        weights = {}
+        for layer in weights_dict.keys():
+            weights[layer] = torch.Tensor(weights_dict[layer])
         self.load_state_dict(weights)
