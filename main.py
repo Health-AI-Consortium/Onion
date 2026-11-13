@@ -47,9 +47,12 @@ if __name__ == "__main__":
     config = {
             "num_rounds": 3,
             "model" : "base",
-            "participating_orgs": [0,1],
+            "organizations": [2,3],
+            "participating_orgs": [2,3],
             "seed" : 7,
-            "current_level" : -1
+            "current_level" : -1,
+            "algorithm_image": credentials.algorithm_image,
+            "encryption": None
         }
 
 

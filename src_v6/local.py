@@ -38,7 +38,7 @@ def sub_central(config, model_weights):
     client = Client(os.environ['SERVER_URL'], os.environ['SERVER_PORT'], os.environ['SERVER_API'], log_level = 'debug')
     client.authenticate(os.environ['USERNAME'], os.environ['PASSWORD'])
 
-    if config['encryption']:
+    if config.get('encryption', None) is not None:
         client.setup_encryption(os.environ['PRIVATE_KEY'])
 
     #TODO: this doesn't seem stable with multiple collabs
@@ -55,7 +55,7 @@ def sub_central(config, model_weights):
     task = client.task.create(
         input_ = input,
         image = config['algorithm_image'],
-        organizations = config['organizations'], #TODO: this needs to be specific for this layer somehow
+        organizations = config['participating_orgs'], #TODO: this needs to be specific for this layer somehow
         collaboration = collab,
         name = f"{config['algorithm_image']}_central", #TODO: define which layer
         description = f"central part of {config['algorithm_image']}"

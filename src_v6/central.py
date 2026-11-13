@@ -42,7 +42,7 @@ def central(client: AlgorithmClient, config: dict, model_weights = None) -> Any:
             input_ = input_,
             organizations=participating_orgs
         )
-        task_results = client.wait_for_results(task)
+        task_results = client.wait_for_results(task.get("id"))
 
         # parse local results and average
         metrics[f'round {round}'] = {}
