@@ -50,7 +50,7 @@ if __name__ == "__main__":
             "organizations": [2,3],
             "participating_orgs": [2,3],
             "seed" : 7,
-            "current_level" : -1,
+            "network_depth" : 1,
             "algorithm_image": credentials.algorithm_image,
             "encryption": None
         }

@@ -17,7 +17,7 @@ from test.test_data.load_MNIST import MnistDataloader
 
 def local(config: dict, model_weights: Any):
 
-    if os.environ['END_NODE'] == True:
+    if config['network_depth'] == 0: # end of network
     # load this client's local data shard
         default_path = "test/test/data/MNIST/"
         base_path = os.environ.get("DATA_PATH", default_path)
@@ -43,9 +43,10 @@ def sub_central(config, model_weights):
 
     #TODO: this doesn't seem stable with multiple collabs
     collab = client.collaboration.list()['data'][0]['id']
+    config['network_depth'] = config['network_depth'] -1 # decrement network depth
 
     input = {
-        "method": "central",
+        "method": "local",
         "kwargs": {
             "config": config,
             "model_weights": model_weights
