@@ -17,7 +17,7 @@ from test.test_data.load_MNIST import MnistDataloader
 
 def local(config: dict, model_weights: Any):
 
-    if os.environ['END_NODE'] == "TRUE":
+    if os.environ['END_NODE'] == True:
     # load this client's local data shard
         default_path = "test/test/data/MNIST/"
         base_path = os.environ.get("DATA_PATH", default_path)
